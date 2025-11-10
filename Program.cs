@@ -1,5 +1,6 @@
 using FacturasWEB.Components;
 using FacturasWEB.Components.Data;
+using FacturasWEB.Components.Servicios;
 using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Retrieve the connection string from appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Register SqliteConnection as a singleton service
+builder.Services.AddSingleton(new SqliteConnection(connectionString));
+
+
+builder.Services.AddSingleton<ServicioControlador>();
 builder.Services.AddSingleton<ServicioFacturas>();
 
 var app = builder.Build();
