@@ -3,8 +3,8 @@
     public class Factura
     {
         public int ID_facturas { get; set; }
-        public string nombre { set; get; }
-        public string fecha { get; set; }
-        public List<Articulo> articulos { get; set; } = new List<Articulo>();
+        public string Nombre { set; get; }
+        public string Fecha { get; set; }
+        public List<Articulo> Articulos { get; set; } = new List<Articulo>();
     }
 }

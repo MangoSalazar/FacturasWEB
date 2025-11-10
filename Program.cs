@@ -13,11 +13,11 @@ builder.Services.AddRazorComponents()
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Register SqliteConnection as a singleton service
-builder.Services.AddSingleton(new SqliteConnection(connectionString));
+builder.Services.AddScoped(sp => new SqliteConnection(connectionString));
 
 
-builder.Services.AddSingleton<ServicioControlador>();
-builder.Services.AddSingleton<ServicioFacturas>();
+builder.Services.AddScoped<ServicioControlador>();
+builder.Services.AddScoped<ServicioFacturas>();
 
 var app = builder.Build();
 
@@ -54,7 +54,6 @@ Articulos (
     Precio REAL NOT NULL -- 'REAL' es el tipo para números decimales en SQLite
 );
 
-
 CREATE TABLE if not exists
 Facturas (
     ID_facturas INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,17 +61,12 @@ Facturas (
     Nombre TEXT NOT NULL 
 );
 
-
 CREATE TABLE if not exists
 Contiene (
     ID_facturas INTEGER NOT NULL,
     ID_articulos INTEGER NOT NULL,
     Cantidad INTEGER NOT NULL,
-    
-
     PRIMARY KEY (ID_facturas, ID_articulos),
-    
-
     FOREIGN KEY (ID_facturas) REFERENCES Facturas(ID_facturas)
         ON DELETE CASCADE,
     FOREIGN KEY (ID_articulos) REFERENCES Articulos(ID_articulos)

@@ -4,16 +4,29 @@ namespace FacturasWEB.Components.Servicios
 {
     public class ServicioControlador
     {
-        private readonly ServicioFacturas _servicoFacturas;
+        private readonly ServicioFacturas _servicioFacturas;
 
         public ServicioControlador(ServicioFacturas servicioFacturas)
         {
-            _servicoFacturas = servicioFacturas;
+            _servicioFacturas = servicioFacturas;
         }
 
         public async Task<List<Factura>> obtenerFacturas()
         {
-            return await _servicoFacturas.obtenerFacturas();
+            return await _servicioFacturas.obtenerFacturas();
+        }
+        public async Task<List<Articulo>> ObtenerArticulosParaDropdown()
+        {
+
+            return await _servicioFacturas.ObtenerArticulosSimplesAsync();
+        }
+        public async Task GuardarNuevaFactura(Factura facturaAGuardar)
+        {
+            await _servicioFacturas.GuardarFacturaAsync(facturaAGuardar);
+        }
+        public async Task<int> CrearYDevolverArticuloAsync(Articulo articuloAGuardar)
+        {
+            return await _servicioFacturas.CrearArticuloAsync(articuloAGuardar);
         }
     }
 }
