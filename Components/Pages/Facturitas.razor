@@ -9,11 +9,11 @@
 
 <div>
     <label>Nombre del Cliente:</label>
-    <input />
+    <input type="text" @bind="nuevaFactura.Nombre"/>
 </div>
 <div>
     <label>Fecha:</label>
-    <input type="date"  />
+    <input type="date" @bind=""  />
 </div>
 
 <hr />
@@ -63,6 +63,7 @@
     <button>Guardar la factura</button>
 </div>
 @code {
+	private Factura nuevaFactura = new Factura();
     private Articulo nuevoArticulo = new Articulo();
     private List<Articulo> articulos = new List<Articulo>();
     private double total = 0.0;
