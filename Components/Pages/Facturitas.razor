@@ -37,6 +37,7 @@
 @code {
     private Articulo nuevoArticulo = new Articulo();
     private List<Articulo> articulos = new List<Articulo>();
+    private double total = 0.0;
     private async Task agregarArticulo()
     {
         if (!string.IsNullOrWhiteSpace(nuevoArticulo.Nombre))
@@ -47,6 +48,7 @@
                 Precio = nuevoArticulo.Precio,
                 Cantidad = nuevoArticulo.Cantidad
             });
+            total += nuevoArticulo.Precio * nuevoArticulo.Cantidad;
         }  
     }
 }
@@ -55,26 +57,21 @@
 <h4>Artículos de la Factura</h4>
 
 <ol>
-    @code{}
-    <li>
-        <span>Coca-Cola 600ml</span> |
-        <span>Precio: 18.50</span> |
-        <span>Cantidad: 2</span> |
-        <span>Subtotal: 37.00</span>
-        <button>Eliminar</button>
-    </li>
-    <li>
-        <span>Sabritas Fuego</span> |
-        <span>Precio: 16.00</span> |
-        <span>Cantidad: 1</span> |
-        <span>Subtotal: 16.00</span>
-        <button>Eliminar</button>
-    </li>
+    @foreach (var art in articulos)
+    {
+        <li>
+            <span>@art.Nombre</span> |
+            <span>Precio: @art.Precio</span> |
+            <span>Cantidad: @art.Cantidad</span> |
+            <span>Subtotal: @(art.Precio * art.Cantidad)</span>
+            <button @onclick="() => articulos.Remove(art)">Eliminar</button>
+        </li>
+    }
 </ol>
 
 <div>
-    <h4>Total: 53.00</h4>
-    @* Este total se calculará dinámicamente *@
+    <h4>Total: @total </h4>
+    
 </div>
 
 <hr />
