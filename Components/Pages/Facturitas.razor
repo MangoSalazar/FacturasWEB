@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<h3>Nueva Factura (Facturitas)</h3>
+<h3>Nueva Factura</h3>
 
 <div>
     <label>Nombre del Cliente:</label>
@@ -13,7 +13,7 @@
 </div>
 <div>
     <label>Fecha:</label>
-    <input type="date" />
+    <input type="date"  />
 </div>
 
 <hr />
@@ -34,24 +34,7 @@
     </div>
     <button @onclick="agregarArticulo">Añadir ese articulo</button>
 </div>
-@code {
-    private Articulo nuevoArticulo = new Articulo();
-    private List<Articulo> articulos = new List<Articulo>();
-    private double total = 0.0;
-    private async Task agregarArticulo()
-    {
-        if (!string.IsNullOrWhiteSpace(nuevoArticulo.Nombre))
-        {
-            articulos.Add(new Articulo
-            {
-                Nombre = nuevoArticulo.Nombre,
-                Precio = nuevoArticulo.Precio,
-                Cantidad = nuevoArticulo.Cantidad
-            });
-            total += nuevoArticulo.Precio * nuevoArticulo.Cantidad;
-        }  
-    }
-}
+
 <hr />
 
 <h4>Artículos de la Factura</h4>
@@ -64,7 +47,7 @@
             <span>Precio: @art.Precio</span> |
             <span>Cantidad: @art.Cantidad</span> |
             <span>Subtotal: @(art.Precio * art.Cantidad)</span>
-            <button @onclick="() => articulos.Remove(art)">Eliminar</button>
+            <button @onclick="() => eliminarArticulo(art)">Eliminar</button>
         </li>
     }
 </ol>
@@ -79,3 +62,31 @@
 <div>
     <button>Guardar la factura</button>
 </div>
+@code {
+    private Articulo nuevoArticulo = new Articulo();
+    private List<Articulo> articulos = new List<Articulo>();
+    private double total = 0.0;
+    protected override async Task OnInitializedAsync()
+    {
+        articulos = await Controlador.obtenerArticulos();
+    }
+
+    private async Task eliminarArticulo(Articulo articulo)
+    {
+        Controlador.eliminarArticulo(articulo);
+        articulos = await Controlador.obtenerArticulos();
+		total -= articulo.Precio * articulo.Cantidad;
+    }
+
+    private async Task agregarArticulo()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) &&
+        nuevoArticulo.Precio > 0 &&
+        nuevoArticulo.Cantidad > 0)
+        {
+            Controlador.agregarArticulo(nuevoArticulo);
+            articulos = await Controlador.obtenerArticulos();
+            total += nuevoArticulo.Precio * nuevoArticulo.Cantidad;
+        }
+    }
+}

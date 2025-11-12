@@ -13,14 +13,17 @@ namespace FacturasWEB.Components.Data
         private List<Factura> facturas = new List<Factura>();
         private List<Articulo> articulos = new List<Articulo>();
 
+        public async Task agregarArticulo(Articulo articulo)
+        {
+            articulos.Add(articulo);
+        }
+        public async Task eliminarArticulo(Articulo articulo)
+        {
+            articulos.RemoveAll(j => j.Nombre == articulo.Nombre);
+        }
+
         public async Task<List<Articulo>> obtenerArticulos()
         {
-            String ruta = "mibase.db";
-            using var conexion = new SqliteConnection($"DataSource={ruta}");
-            await conexion.OpenAsync();
-            var sql = "SELECT * FROM Articulos;";
-            var resultado = await conexion.QueryAsync<Articulo>(sql);
-            articulos = resultado.ToList();
             return articulos;
         }
 
