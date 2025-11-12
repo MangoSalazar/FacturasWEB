@@ -11,6 +11,10 @@ namespace FacturasWEB.Components.Servicios
             _servicioFacturas = servicioFacturas;
         }
 
+        public async Task<List<Articulo>> obtenerArticulos()
+        {
+            return await _servicioFacturas.obtenerArticulos();
+        }
         public async Task<List<Factura>> obtenerFacturas()
         {
             return await _servicioFacturas.obtenerFacturas();

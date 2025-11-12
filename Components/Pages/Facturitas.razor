@@ -3,174 +3,69 @@
 @using FacturasWEB.Components.Servicios
 @inject ServicioControlador Controlador
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
-<h3>Crear Factura</h3>
+<h3>Nueva Factura (Facturitas)</h3>
 
 <div>
     <label>Nombre del Cliente:</label>
-    <input @bind="nuevaFactura.Nombre" />
+    <input />
 </div>
 <div>
     <label>Fecha:</label>
-    <input type="date" @bind="fechaInputDate" />
+    <input type="date" />
 </div>
 
 <hr />
 
-<h4>Agregar Artículo Existente</h4>
 <div>
-    <label>Artículo:</label>
-    <select @bind="selectedArticuloId">
-        <option value="0">-- Seleccione --</option>
-        @foreach (var art in articulosDisponibles)
-        {
-            <option value="@art.ID_articulos">@art.Nombre (@art.Precio.ToString("C"))</option>
-        }
-    </select>
-</div>
-<div>
-    <label>Cantidad:</label>
-    <input type="number" min="1" @bind="selectedCantidadExistente" />
-</div>
-<button @onclick="AgregarArticuloExistenteALista">Añadir Artículo Existente</button>
-
-<hr />
-
-<h4>Crear y Añadir Nuevo Artículo</h4>
-<div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+    <h4>Añadir Artículo</h4>
     <div>
-        <label>Nombre Nuevo Artículo:</label>
-        <input @bind="nuevoArticulo.Nombre" />
+        <label>Artículo:</label>
+        <input placeholder="Nombre del articulo"/>
     </div>
     <div>
-        <label>Precio Nuevo Artículo:</label>
-        <input type="number" step="0.01" @bind="nuevoArticulo.Precio" />
+        <label>Precio:</label>
+        <input type="number" step="0.5" min="0.1"/>
     </div>
     <div>
         <label>Cantidad:</label>
-        <input type="number" min="1" @bind="nuevoArticulo.Cantidad" />
+        <input type="number" min="1" placeholder="1"/>
     </div>
-    <button @onclick="AñadirNuevoArticuloALista" class="btn btn-info">Crear y Añadir Artículo</button>
+    <button>Añadir ese articulo</button>
 </div>
 
 <hr />
 
-<h4>Artículos en esta Factura</h4>
-<ul>
-    @foreach (var art in nuevaFactura.Articulos)
-    {
-        <li>
-            @art.Nombre - Cantidad: @art.Cantidad - Subtotal: @((art.Precio * art.Cantidad).ToString("C"))
-        </li>
-    }
-</ul>
-<p><strong>Total: @TotalFactura.ToString("C")</strong></p>
+<h4>Artículos de la Factura</h4>
 
-<button @onclick="GuardarFactura">Guardar Factura</button>
+<ol>
+    @* Aquí irá un bucle @foreach cuando programemos el código.
+      Por ahora, pongo ejemplos estáticos de cómo se verá cada renglón:
+    *@
+    <li>
+        <span>Coca-Cola 600ml</span> |
+        <span>Precio: 18.50</span> |
+        <span>Cantidad: 2</span> |
+        <span>Subtotal: 37.00</span>
+        <button>Eliminar</button>
+    </li>
+    <li>
+        <span>Sabritas Fuego</span> |
+        <span>Precio: 16.00</span> |
+        <span>Cantidad: 1</span> |
+        <span>Subtotal: 16.00</span>
+        <button>Eliminar</button>
+    </li>
+</ol>
 
-<p style="color:red">@mensajeError</p>
-<p style="color:green">@mensajeExito</p>
+<div>
+    <h4>Total: 53.00</h4>
+    @* Este total se calculará dinámicamente *@
+</div>
 
-@code {
-    // Usamos el alias para la clase Factura
-    private Factura nuevaFactura = new Factura();
+<hr />
 
-    // Lista para el dropdown
-    private List<Articulo> articulosDisponibles = new List<Articulo>();
-
-    // (NUEVO) Objeto para el formulario de nuevo artículo
-    private Articulo nuevoArticulo = new Articulo { Cantidad = 1 }; // Inicia en 1
-
-    // Variables de formulario
-    private int selectedArticuloId;
-    private int selectedCantidadExistente = 1;
-    private DateTime fechaInputDate = DateTime.Today; // Changed from string to DateTime
-    private string mensajeError = "";
-    private string mensajeExito = "";
-
-    private double TotalFactura => nuevaFactura.Articulos.Sum(a => a.Precio * a.Cantidad);
-
-    // Al iniciar, le pide los artículos al CONTROLADOR (sigue igual)
-    protected override async Task OnInitializedAsync()
-    {
-        articulosDisponibles = await Controlador.ObtenerArticulosParaDropdown();
-    }
-
-    // Método para el dropdown (antes se llamaba AgregarArticuloALista)
-    private void AgregarArticuloExistenteALista()
-    {
-        var artOriginal = articulosDisponibles.FirstOrDefault(a => a.ID_articulos == selectedArticuloId);
-        if (artOriginal != null)
-        {
-            // Usamos la propiedad pública 'Articulos' (con mayúscula)
-            nuevaFactura.Articulos.Add(new Articulo
-            {
-                ID_articulos = artOriginal.ID_articulos,
-                Nombre = artOriginal.Nombre,
-                Precio = artOriginal.Precio,
-                Cantidad = selectedCantidadExistente
-            });
-        }
-        selectedArticuloId = 0;
-        selectedCantidadExistente = 1;
-    }
-
-    private async Task AñadirNuevoArticuloALista()
-    {
-        mensajeError = "";
-        mensajeExito = "";
-
-        if (string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) || nuevoArticulo.Precio <= 0 || nuevoArticulo.Cantidad <= 0)
-        {
-            mensajeError = "Por favor, complete todos los campos del nuevo artículo (Nombre, Precio > 0, Cantidad > 0).";
-            return;
-        }
-
-        try
-        {
-
-            int nuevoId = await Controlador.CrearYDevolverArticuloAsync(nuevoArticulo);
-
-            // 3. Asignar el nuevo ID al objeto
-            nuevoArticulo.ID_articulos = nuevoId;
-
-            // 4. Añadir el artículo (con su nuevo ID) a la lista de la factura
-            //    Usamos la propiedad pública 'Articulos' (con mayúscula)
-            nuevaFactura.Articulos.Add(nuevoArticulo);
-
-            // 5. (Opcional pero recomendado) Añadirlo también a la lista del dropdown
-            //    para que se pueda seleccionar la próxima vez.
-            articulosDisponibles.Add(nuevoArticulo);
-
-            // 6. Limpiar el formulario para el siguiente
-            nuevoArticulo = new Articulo { Cantidad = 1 };
-        }
-        catch (Exception ex)
-        {
-            mensajeError = $"Error al crear el artículo: {ex.Message}";
-        }
-    }
-
-    // Al guardar, le pasa la factura completa al CONTROLADOR (sigue igual)
-    private async Task GuardarFactura()
-    {
-        // ... (el código de GuardarFactura sigue igual que antes) ...
-        mensajeError = "";
-        mensajeExito = "";
-        try
-        {
-            nuevaFactura.Fecha = fechaInputDate.ToString("yyyy-MM-dd"); // Convert DateTime to string
-
-            await Controlador.GuardarNuevaFactura(nuevaFactura);
-
-            mensajeExito = "¡Factura guardada!";
-
-
-            nuevaFactura = new Factura(); 
-        }
-        catch (Exception ex)
-        {
-            mensajeError = $"Error: {ex.Message}";
-        }
-    }
-}
+<div>
+    <button>Guardar la factura</button>
+</div>

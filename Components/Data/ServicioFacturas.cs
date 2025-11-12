@@ -11,6 +11,18 @@ namespace FacturasWEB.Components.Data
     public class ServicioFacturas
     {
         private List<Factura> facturas = new List<Factura>();
+        private List<Articulo> articulos = new List<Articulo>();
+
+        public async Task<List<Articulo>> obtenerArticulos()
+        {
+            String ruta = "mibase.db";
+            using var conexion = new SqliteConnection($"DataSource={ruta}");
+            await conexion.OpenAsync();
+            var sql = "SELECT * FROM Articulos;";
+            var resultado = await conexion.QueryAsync<Articulo>(sql);
+            articulos = resultado.ToList();
+            return articulos;
+        }
 
         public async Task<List<Factura>> obtenerFacturas()
         {
@@ -41,7 +53,6 @@ namespace FacturasWEB.Components.Data
 
                     f.Articulos.AddRange(articulos.Where(a => a.ID_facturas == f.ID_facturas));
                 }
-
                 return facturas;
             }
         }
