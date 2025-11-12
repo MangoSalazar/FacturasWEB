@@ -22,27 +22,40 @@
     <h4>Añadir Artículo</h4>
     <div>
         <label>Artículo:</label>
-        <input placeholder="Nombre del articulo"/>
+        <input @bind="nuevoArticulo.Nombre" placeholder="Nombre del articulo" />
     </div>
     <div>
         <label>Precio:</label>
-        <input type="number" step="0.5" min="0.1"/>
+        <input @bind="nuevoArticulo.Precio" type="number" step="0.5" min="0.1" />
     </div>
     <div>
         <label>Cantidad:</label>
-        <input type="number" min="1" placeholder="1"/>
+        <input @bind="nuevoArticulo.Cantidad" type="number" min="1" placeholder="1" />
     </div>
-    <button>Añadir ese articulo</button>
+    <button @onclick="agregarArticulo">Añadir ese articulo</button>
 </div>
-
+@code {
+    private Articulo nuevoArticulo = new Articulo();
+    private List<Articulo> articulos = new List<Articulo>();
+    private async Task agregarArticulo()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoArticulo.Nombre))
+        {
+            articulos.Add(new Articulo
+            {
+                Nombre = nuevoArticulo.Nombre,
+                Precio = nuevoArticulo.Precio,
+                Cantidad = nuevoArticulo.Cantidad
+            });
+        }  
+    }
+}
 <hr />
 
 <h4>Artículos de la Factura</h4>
 
 <ol>
-    @* Aquí irá un bucle @foreach cuando programemos el código.
-      Por ahora, pongo ejemplos estáticos de cómo se verá cada renglón:
-    *@
+    @code{}
     <li>
         <span>Coca-Cola 600ml</span> |
         <span>Precio: 18.50</span> |
