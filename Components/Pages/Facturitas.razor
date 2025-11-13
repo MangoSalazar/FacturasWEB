@@ -13,7 +13,7 @@
 </div>
 <div>
     <label>Fecha:</label>
-    <input type="date" @bind=""  />
+    <input type="date" @bind="fechaParaInput"  />
 </div>
 
 <hr />
@@ -60,13 +60,19 @@
 <hr />
 
 <div>
-    <button>Guardar la factura</button>
+    <button @onclick="guardarFactura">Guardar la factura</button>
 </div>
+@mensajeError
+
 @code {
-	private Factura nuevaFactura = new Factura();
+    private Factura nuevaFactura = new Factura();
     private Articulo nuevoArticulo = new Articulo();
     private List<Articulo> articulos = new List<Articulo>();
+    private DateTime fechaParaInput = DateTime.Today;
     private double total = 0.0;
+
+    private string mensajeError = "";
+
     protected override async Task OnInitializedAsync()
     {
         articulos = await Controlador.obtenerArticulos();
@@ -76,18 +82,40 @@
     {
         Controlador.eliminarArticulo(articulo);
         articulos = await Controlador.obtenerArticulos();
-		total -= articulo.Precio * articulo.Cantidad;
+        total -= articulo.Precio * articulo.Cantidad;
     }
 
     private async Task agregarArticulo()
     {
-        if (!string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) &&
-        nuevoArticulo.Precio > 0 &&
-        nuevoArticulo.Cantidad > 0)
+        mensajeError = "";
+        if (string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) ||
+        nuevoArticulo.Precio <= 0 ||
+        nuevoArticulo.Cantidad <= 0)
         {
-            Controlador.agregarArticulo(nuevoArticulo);
-            articulos = await Controlador.obtenerArticulos();
-            total += nuevoArticulo.Precio * nuevoArticulo.Cantidad;
+            mensajeError = "Faltan datos obligatorios del artículo";
+            return;
         }
+        Controlador.agregarArticulo(nuevoArticulo);
+        articulos = await Controlador.obtenerArticulos();
+        total += nuevoArticulo.Precio * nuevoArticulo.Cantidad;
+        nuevoArticulo = new Articulo();
+
+    }
+
+    private async Task guardarFactura()
+    {
+        mensajeError = "";
+        if (!string.IsNullOrWhiteSpace(nuevaFactura.Nombre) && articulos.Any())
+        {
+            nuevaFactura.Fecha = fechaParaInput.ToString("yyyy-MM-dd");
+            nuevaFactura.Nombre = nuevaFactura.Nombre?.Trim();
+            nuevaFactura.Articulos = articulos;
+            await Controlador.guardarFactura(nuevaFactura);
+            Console.WriteLine("factura añadida");
+            nuevaFactura = new Factura();
+            return;
+        }
+        mensajeError = "Faltan datos obligatorios";
+
     }
 }

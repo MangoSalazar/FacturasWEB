@@ -58,7 +58,7 @@ CREATE TABLE if not exists
 Facturas (
     ID_facturas INTEGER PRIMARY KEY AUTOINCREMENT,
     Fecha TEXT NOT NULL, 
-    Nombre TEXT NOT NULL 
+    Nombre TEXT NOT NULL
 );
 
 CREATE TABLE if not exists

@@ -29,20 +29,9 @@ namespace FacturasWEB.Components.Servicios
         {
             return await _servicioFacturas.obtenerFacturas();
         }
-
-
-        public async Task<List<Articulo>> ObtenerArticulosParaDropdown()
+        public async Task guardarFactura(Factura factura)
         {
-
-            return await _servicioFacturas.ObtenerArticulosSimplesAsync();
-        }
-        public async Task GuardarNuevaFactura(Factura facturaAGuardar)
-        {
-            await _servicioFacturas.GuardarFacturaAsync(facturaAGuardar);
-        }
-        public async Task<int> CrearYDevolverArticuloAsync(Articulo articuloAGuardar)
-        {
-            return await _servicioFacturas.CrearArticuloAsync(articuloAGuardar);
+            _servicioFacturas.guardarFactura(factura);
         }
     }
 }
