@@ -49,6 +49,14 @@ namespace FacturasWEB.Components.Data
             }
             await conexion.ExecuteAsync("PRAGMA foreign_keys = ON;");
         }
+        
+        public async Task cerrarConexion()
+        {
+            if (conexion.State != System.Data.ConnectionState.Closed)
+            {
+                await conexion.CloseAsync();
+            }
+        }
 
         public async Task guardarFactura(Factura factura)
         {
@@ -99,6 +107,8 @@ namespace FacturasWEB.Components.Data
                     transaction.Commit();
                     articulos.Clear();
                     Console.WriteLine("Factura guardada correctamente.");
+
+                    cerrarConexion();
 
                 }
                 catch (Exception)
