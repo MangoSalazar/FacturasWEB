@@ -48,7 +48,34 @@ namespace FacturasWEB.Components.Data
 
         public async Task<List<Factura>> obtenerFacturas()
         {
-            return facturas;
+            iniciarConexion();
+            facturas.Clear();
+            var sql = @"
+            SELECT * FROM Facturas;
+        
+            SELECT 
+                c.ID_facturas,  -- ID de la factura a la que pertenece
+                c.Cantidad,
+                a.ID_articulos,
+                a.Nombre,
+                a.Precio
+            FROM Articulos a
+            JOIN Contiene c ON a.ID_articulos = c.ID_articulos;";
+
+            using (var multi = await conexion.QueryMultipleAsync(sql))
+            {
+                var facturas = (await multi.ReadAsync<Factura>()).ToList();
+                Console.WriteLine($"Facturas obtenidas: {facturas.Count}");
+                // (Nota: Tu clase Articulo ya tiene ID_facturas y Cantidad)
+                var articulos = (await multi.ReadAsync<Articulo>()).ToList();
+                foreach (var factura in facturas)
+                {
+                    // Asigna a CADA factura su lista de artículos correspondiente
+                    factura.Articulos.AddRange(articulos.Where(a => a.ID_facturas == factura.ID_facturas));
+                    Console.WriteLine($"Factura ID {factura.ID_facturas} tiene {factura.Articulos.Count} artículos.");
+                }
+                return facturas;
+            }
         }
         private async Task iniciarConexion() 
         {
