@@ -7,11 +7,7 @@
 
 <h3>Lista de Facturas</h3>
 
-@if (facturasCargadas == null)
-{
-    <p>Cargando facturas...</p>
-}
-else if (!facturasCargadas.Any())
+@if (!facturasCargadas.Any())
 {
     <p>No hay facturas guardadas en la base de datos.</p>
 }
@@ -21,9 +17,8 @@ else
         <thead>
             <tr>
                 <th>Fecha</th>
-                <th>Nombre Cliente</th>
+                <th>Nombre  </th>
                 <th>Cantidad de Artículos</th>
-                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -47,13 +42,11 @@ else
 
     private List<Factura> facturasCargadas;
 
-    // Cuando la página carga, llama al controlador
+    
     protected override async Task OnInitializedAsync()
     {
         facturasCargadas = await Controlador.obtenerFacturas();
     }
-
-    // Métodos para los botones (por ahora solo imprimen en la consola)
 
     private void Editar(int idFactura)
     {
