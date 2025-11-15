@@ -14,7 +14,7 @@ namespace FacturasWEB.Components.Data
         private List<Factura> facturas = new List<Factura>();
         private List<Articulo> articulos = new List<Articulo>();
 
-        public async Task agregarArticulo(Articulo articulo)
+        public async Task agregarArticuloTemporal(Articulo articulo)
         {
             var articuloExistente = articulos.FirstOrDefault(a => a.Nombre.Trim().ToLower() == articulo.Nombre.Trim().ToLower());
 
@@ -26,11 +26,21 @@ namespace FacturasWEB.Components.Data
             articulos.Add(articulo);
             
         }
-        public async Task eliminarArticulo(Articulo articulo)
+        public async Task eliminarArticuloTemporal(Articulo articulo)
         {
             articulos.RemoveAll(j => j.Nombre == articulo.Nombre);
         }
+        public void actualizarArticuloTemporal(Articulo articuloOriginal, Articulo articuloActualizado)
+        {
+            var articuloEnLista = articulos.FirstOrDefault(a => a == articuloOriginal);
+            if (articuloEnLista != null)
+            {
+                articuloEnLista.Nombre = articuloActualizado.Nombre;
+                articuloEnLista.Precio = articuloActualizado.Precio;
+                articuloEnLista.Cantidad = articuloActualizado.Cantidad;
+            }
 
+        }
         public async Task<List<Articulo>> obtenerArticulos()
         {
             return articulos;
@@ -58,6 +68,7 @@ namespace FacturasWEB.Components.Data
             }
         }
 
+
         public async Task guardarFactura(Factura factura)
         {
             iniciarConexion();
@@ -71,6 +82,7 @@ namespace FacturasWEB.Components.Data
                     await conexion.ExecuteAsync(sqlFactura, factura, transaction);
 
                     var nuevaFacturaId = await conexion.QuerySingleAsync<int>("SELECT last_insert_rowid();", transaction: transaction);
+                    factura.ID_facturas = nuevaFacturaId;
 
                     var sqlBuscarArticulo = "SELECT ID_articulos FROM Articulos WHERE Nombre = @Nombre;";
                     var sqlCrearArticulo = "INSERT INTO Articulos (Nombre, Precio) VALUES (@Nombre, @Precio);";
@@ -84,18 +96,16 @@ namespace FacturasWEB.Components.Data
 
                         if (idExistente.HasValue)
                         {
-                            // SÍ EXISTE: Usamos el ID que encontramos
                             articuloId = idExistente.Value;
                             Console.WriteLine("articulo existe");
                         }
                         else
                         {
-                            // NO EXISTE: Lo creamos en la tabla 'Articulos'
                             await conexion.ExecuteAsync(sqlCrearArticulo, articulo, transaction);
                             articuloId = await conexion.QuerySingleAsync<int>("SELECT last_insert_rowid();", transaction: transaction);
                             Console.WriteLine("articulo añadido");
                         }
-
+                        articulo.ID_articulo = articuloId;
                         await conexion.ExecuteAsync(sqlCrearContiene, new
                         {
                             ID_facturas = nuevaFacturaId,
@@ -105,6 +115,7 @@ namespace FacturasWEB.Components.Data
                     }
 
                     transaction.Commit();
+                    this.facturas.Add(factura);
                     articulos.Clear();
                     Console.WriteLine("Factura guardada correctamente.");
 

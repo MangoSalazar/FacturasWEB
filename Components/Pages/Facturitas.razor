@@ -47,6 +47,7 @@
             <span>Precio: @art.Precio</span> |
             <span>Cantidad: @art.Cantidad</span> |
             <span>Subtotal: @(art.Precio * art.Cantidad)</span>
+            <button @onclick="() => actualizarArticulo(art)">Editar</button>
             <button @onclick="() => eliminarArticulo(art)">Eliminar</button>
         </li>
     }
@@ -101,6 +102,20 @@
         nuevoArticulo = new Articulo();
 
     }
+    private async Task actualizarArticulo(Articulo articuloOriginal)
+    {
+        mensajeError = "";
+        if (string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) ||
+        nuevoArticulo.Precio <= 0 ||
+        nuevoArticulo.Cantidad <= 0)
+        {
+            mensajeError = "Faltan datos obligatorios del artículo";
+            return;
+        }
+        Controlador.actualizarArticulo(articuloOriginal, nuevoArticulo);
+        articulos = await Controlador.obtenerArticulos();
+        total = articulos.Sum(a => a.Precio * a.Cantidad);
+    }
 
     private async Task guardarFactura()
     {
@@ -113,6 +128,7 @@
             await Controlador.guardarFactura(nuevaFactura);
             Console.WriteLine("factura añadida");
             nuevaFactura = new Factura();
+            total = 0.0;
             return;
         }
         mensajeError = "Faltan datos obligatorios";
