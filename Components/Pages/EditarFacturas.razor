@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-@* 1. AÑADE ESTO: Evita errores mientras cargan los datos *@
+
 @if (facturaAEditar == null)
 {
     <p>Cargando datos de la factura...</p>
@@ -35,7 +35,7 @@ else
         </div>
         <div>
             <label>Precio:</label>
-            <input type="number" step="0.01" @bind="articuloEnFormulario.Precio" />
+            <input type="number" step="0.1" @bind="articuloEnFormulario.Precio" />
         </div>
         <div>
             <label>Cantidad:</label>
@@ -125,7 +125,6 @@ else
             Precio = articulo.Precio,
             Cantidad = articulo.Cantidad
         };
-        // Guarda la referencia al objeto original
         articuloSiendoEditado = articulo;
     }
 
