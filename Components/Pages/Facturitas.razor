@@ -81,6 +81,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Controlador.cargarArticulos(articulos);
         articulos = await Controlador.obtenerArticulos();
     }
 

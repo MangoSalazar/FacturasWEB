@@ -45,6 +45,12 @@ namespace FacturasWEB.Components.Data
         {
             return articulos;
         }
+        public async Task<List<Articulo>> cargarArticulos(List<Articulo> articulosCargados)
+        {
+            articulos.Clear();
+            articulos = articulosCargados;
+            return articulos;
+        }
 
         public async Task<List<Factura>> obtenerFacturas()
         {

@@ -28,6 +28,10 @@ namespace FacturasWEB.Components.Servicios
         {
             _servicioFacturas.actualizarArticuloTemporal(articuloOriginal,articulo);
         }
+        public async Task<List<Articulo>> cargarArticulos(List<Articulo> articulos)
+        {
+            return await _servicioFacturas.cargarArticulos(articulos);
+        }
         public async Task<List<Factura>> obtenerFacturas()
         {
             return await _servicioFacturas.obtenerFacturas();

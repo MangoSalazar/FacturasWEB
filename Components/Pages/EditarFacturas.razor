@@ -103,10 +103,7 @@ else
 
             if (facturaAEditar != null)
             {
-                // Copiamos los artículos de la factura a nuestra lista de memoria
-                articulosEnMemoria = new List<Articulo>(facturaAEditar.Articulos);
-
-                // Convertimos la fecha (string) a un DateTime para el input
+                articulosEnMemoria = await Controlador.cargarArticulos(facturaAEditar.Articulos);
                 DateTime.TryParse(facturaAEditar.Fecha, out fechaParaInput);
             }
             else
@@ -140,7 +137,8 @@ else
 
     private async Task EliminarArticulo(Articulo articulo)
     {
-        articulosEnMemoria.Remove(articulo);
+        Controlador.eliminarArticulo(articulo);
+        articulosEnMemoria = await Controlador.obtenerArticulos();
     }
 
     private async Task AgregarOActualizarArticulo()
@@ -163,8 +161,6 @@ else
         articuloEnFormulario = new Articulo();
         mensajeError = "";
     }
-
-
     private async Task GuardarCambios()
     {
         mensajeError = "";
@@ -185,7 +181,6 @@ else
 
     private async Task Cancelar()
     {
-        // Simplemente regresa a la lista
         NavigationManager.NavigateTo("/lista-facturas");
     }
 }
