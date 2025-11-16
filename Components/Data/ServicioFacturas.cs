@@ -263,7 +263,6 @@ namespace FacturasWEB.Components.Data
         {
             iniciarConexion();
 
-            // Convertimos el año (int) a string para la consulta SQL
             var anoString = ano.ToString();
 
             var sql = @"
@@ -288,15 +287,15 @@ namespace FacturasWEB.Components.Data
                 var facturas = (await multi.ReadAsync<Factura>()).ToList();
                 var articulos = (await multi.ReadAsync<Articulo>()).ToList();
 
-                // 2. Unimos los artículos a sus facturas (como ya lo hiciste)
                 foreach (var factura in facturas)
                 {
                     factura.Articulos.AddRange(articulos.Where(a => a.ID_factura == factura.ID_factura));
                 }
-
+                cerrarConexion();
                 return facturas;
+               
             }
-            cerrarConexion();
+            
         }
     }
 }
