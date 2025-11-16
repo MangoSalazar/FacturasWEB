@@ -53,5 +53,10 @@ namespace FacturasWEB.Components.Servicios
             _servicioFacturas.eliminarFactura(factura);
         }
 
+        public async Task<List<Factura>> ObtenerFacturasPorAno(int ano)
+        {
+            return await _servicioFacturas.ObtenerFacturasPorAno(ano);
+        }
+
     }
 }
