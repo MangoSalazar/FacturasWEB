@@ -44,51 +44,34 @@
 }
 
 @code {
-    // El año que el usuario escribe en el input
+
     private int anoParaBuscar = DateTime.Today.Year;
-
-    // Un array para guardar los 12 totales (Ene, Feb, Mar...)
     private double[] totalesMensuales;
-
-    // El total de todo el año
     private double granTotal;
-
-    // Bandera para saber si ya podemos mostrar la tabla
     private bool reporteGenerado = false;
 
     private async Task GenerarReporte()
     {
-        // 1. Reiniciar los contadores
-        totalesMensuales = new double[12]; // 12 ceros
+        totalesMensuales = new double[12];
         granTotal = 0;
         reporteGenerado = false;
 
-        // 2. Llamar al controlador para traer SOLO las facturas de ese año
         var facturasDelAno = await Controlador.ObtenerFacturasPorAno(anoParaBuscar);
 
-        // 3. Recorrer las facturas y calcular
         foreach (var factura in facturasDelAno)
         {
-            // 3a. Parsear la fecha (que es un string)
             if (DateTime.TryParse(factura.Fecha, out var fechaFactura))
             {
-                // 3b. Calcular el total de ESTA factura
                 double totalFactura = 0;
                 foreach (var articulo in factura.Articulos)
                 {
                     totalFactura += (articulo.Precio * articulo.Cantidad);
                 }
-
-                // 3c. Sumar al mes correspondiente (Ene=0, Feb=1, etc.)
-                int mesIndex = fechaFactura.Month - 1; // .Month va de 1 a 12
+                int mesIndex = fechaFactura.Month - 1;
                 totalesMensuales[mesIndex] += totalFactura;
-
-                // 3d. Sumar al gran total
                 granTotal += totalFactura;
             }
         }
-
-        // 4. Activar la bandera para que se muestre la tabla
         reporteGenerado = true;
     }
 }
