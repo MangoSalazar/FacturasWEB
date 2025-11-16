@@ -258,5 +258,45 @@ namespace FacturasWEB.Components.Data
                 await conexion.CloseAsync();
             }
         }
+
+        public async Task<List<Factura>> ObtenerFacturasPorAno(int ano)
+        {
+            iniciarConexion();
+
+            // Convertimos el año (int) a string para la consulta SQL
+            var anoString = ano.ToString();
+
+            var sql = @"
+                SELECT 
+                    ID_factura, Nombre, Fecha 
+                FROM Facturas 
+                WHERE strftime('%Y', Fecha) = @Ano;
+        
+                SELECT 
+                    c.ID_factura AS ID_factura,
+                    c.Cantidad,
+                    a.ID_articulo,
+                    a.Nombre,
+                    a.Precio
+                FROM Articulos a
+                JOIN Contiene c ON a.ID_articulo = c.ID_articulo
+                WHERE c.ID_factura IN (SELECT ID_factura FROM Facturas WHERE strftime('%Y', Fecha) = @Ano);
+                ";
+
+            using (var multi = await conexion.QueryMultipleAsync(sql, new { Ano = anoString }))
+            {
+                var facturas = (await multi.ReadAsync<Factura>()).ToList();
+                var articulos = (await multi.ReadAsync<Articulo>()).ToList();
+
+                // 2. Unimos los artículos a sus facturas (como ya lo hiciste)
+                foreach (var factura in facturas)
+                {
+                    factura.Articulos.AddRange(articulos.Where(a => a.ID_factura == factura.ID_factura));
+                }
+
+                return facturas;
+            }
+            cerrarConexion();
+        }
     }
 }
