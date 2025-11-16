@@ -77,25 +77,6 @@ namespace FacturasWEB.Components.Data
                 return facturas;
             }
         }
-        private async Task iniciarConexion() 
-        {
-            await conexion.OpenAsync();
-            if (conexion.State != System.Data.ConnectionState.Open)
-            {
-                await conexion.OpenAsync();
-            }
-            await conexion.ExecuteAsync("PRAGMA foreign_keys = ON;");
-        }
-        
-        public async Task cerrarConexion()
-        {
-            if (conexion.State != System.Data.ConnectionState.Closed)
-            {
-                await conexion.CloseAsync();
-            }
-        }
-
-
         public async Task guardarFactura(Factura factura)
         {
             iniciarConexion();
@@ -156,7 +137,45 @@ namespace FacturasWEB.Components.Data
                 }
             }
         }
-
-
+        public async Task eliminarFactura(Factura factura)
+        {
+            iniciarConexion();
+            var sqlEliminarContiene = "DELETE FROM Contiene WHERE ID_facturas = @ID_facturas;";
+            var sqlEliminarFactura = "DELETE FROM Facturas WHERE ID_facturas = @ID_facturas;";
+            using (var transaction = conexion.BeginTransaction())
+            {
+                try
+                {
+                    await conexion.ExecuteAsync(sqlEliminarContiene, new { factura.ID_facturas }, transaction);
+                    await conexion.ExecuteAsync(sqlEliminarFactura, new { factura.ID_facturas }, transaction);
+                    transaction.Commit();
+                    this.facturas.RemoveAll(f => f.ID_facturas == factura.ID_facturas);
+                    Console.WriteLine("Factura eliminada correctamente.");
+                    cerrarConexion();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+        private async Task iniciarConexion() 
+        {
+            await conexion.OpenAsync();
+            if (conexion.State != System.Data.ConnectionState.Open)
+            {
+                await conexion.OpenAsync();
+            }
+            await conexion.ExecuteAsync("PRAGMA foreign_keys = ON;");
+        }
+        
+        public async Task cerrarConexion()
+        {
+            if (conexion.State != System.Data.ConnectionState.Closed)
+            {
+                await conexion.CloseAsync();
+            }
+        }
     }
 }

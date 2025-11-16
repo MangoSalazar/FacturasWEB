@@ -36,5 +36,9 @@ namespace FacturasWEB.Components.Servicios
         {
             _servicioFacturas.guardarFactura(factura);
         }
+        public async Task eliminarFactura(Factura factura)
+        {
+            _servicioFacturas.eliminarFactura(factura);
+        }   
     }
 }
