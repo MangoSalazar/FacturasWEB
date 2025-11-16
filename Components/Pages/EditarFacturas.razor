@@ -1,0 +1,191 @@
+﻿@page "/EditarFactura/{IdFactura:int}"
+@using FacturasWEB.Components.Data
+@using FacturasWEB.Components.Servicios
+@inject ServicioControlador Controlador
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@* 1. AÑADE ESTO: Evita errores mientras cargan los datos *@
+@if (facturaAEditar == null)
+{
+    <p>Cargando datos de la factura...</p>
+}
+else
+{
+    <h3>Editando Factura (@facturaAEditar.Nombre)</h3>
+
+    <div>
+        <label>Nombre del Cliente:</label>
+        <span>(@facturaAEditar.Nombre)</span>
+        <input @bind="facturaAEditar.Nombre" />
+    </div>
+    <div>
+        <label>Fecha:</label>
+        <span>(@facturaAEditar.Fecha)</span>
+        <input type="date" @bind="fechaParaInput" />
+    </div>
+
+    <hr />
+
+    <div>
+        <h4>Añadir/Editar Artículo</h4>
+        <div>
+            <label>Artículo:</label>
+            <input @bind="articuloEnFormulario.Nombre" />
+        </div>
+        <div>
+            <label>Precio:</label>
+            <input type="number" step="0.01" @bind="articuloEnFormulario.Precio" />
+        </div>
+        <div>
+            <label>Cantidad:</label>
+            <input type="number" @bind="articuloEnFormulario.Cantidad" />
+        </div>
+        <button @onclick="AgregarOActualizarArticulo">
+            @(articuloSiendoEditado == null ? "Añadir Artículo" : "Actualizar Artículo")
+        </button>
+        @if (articuloSiendoEditado != null)
+        {
+            <button @onclick="CancelarEdicion">Cancelar Edición</button>
+        }
+    </div>
+
+    <hr />
+
+    <h4>Artículos de la Factura</h4>
+    <ol>
+        @foreach (var art in articulosEnMemoria)
+        {
+            <li>
+                <span>@art.Nombre</span> |
+                <span>Precio: @art.Precio</span> |
+                <span>Cantidad: @art.Cantidad</span> |
+                <span>Subtotal: @(art.Precio* art.Cantidad)</span>
+                <button @onclick="() => CargarArticuloParaEdicion(art)">Editar</button>
+                <button @onclick="() => EliminarArticulo(art)">Eliminar</button>
+            </li>
+        }
+    </ol>
+
+    <div>
+        <h4>Total: @TotalCalculado </h4>
+    </div>
+    <div style="color: red;">@mensajeError</div>
+
+    <hr />
+
+    <div>
+        <button @onclick="GuardarCambios">Guardar Cambios</button>
+        <button @onclick="Cancelar">Cancelar</button>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int IdFactura { get; set; }
+
+    private Factura facturaAEditar;
+    private List<Articulo> articulosEnMemoria = new List<Articulo>();
+    private Articulo articuloEnFormulario = new Articulo();
+    private Articulo articuloSiendoEditado = null;
+    private DateTime fechaParaInput;
+    private string mensajeError = "";
+
+    private double TotalCalculado => articulosEnMemoria.Sum(art => art.Precio * art.Cantidad);
+
+    protected override async Task OnInitializedAsync()
+    {
+        mensajeError = "";
+        try
+        {
+            facturaAEditar = await Controlador.obtenerFacturaPorId(IdFactura);
+
+            if (facturaAEditar != null)
+            {
+                // Copiamos los artículos de la factura a nuestra lista de memoria
+                articulosEnMemoria = new List<Articulo>(facturaAEditar.Articulos);
+
+                // Convertimos la fecha (string) a un DateTime para el input
+                DateTime.TryParse(facturaAEditar.Fecha, out fechaParaInput);
+            }
+            else
+            {
+                mensajeError = "ERROR: No se encontró la factura.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al cargar la factura: {ex.Message}";
+        }
+    }
+
+    private async Task CargarArticuloParaEdicion(Articulo articulo)
+    {
+        articuloEnFormulario = new Articulo
+        {
+            Nombre = articulo.Nombre,
+            Precio = articulo.Precio,
+            Cantidad = articulo.Cantidad
+        };
+        // Guarda la referencia al objeto original
+        articuloSiendoEditado = articulo;
+    }
+
+    private async Task CancelarEdicion()
+    {
+        articuloEnFormulario = new Articulo();
+        articuloSiendoEditado = null;
+    }
+
+    private async Task EliminarArticulo(Articulo articulo)
+    {
+        articulosEnMemoria.Remove(articulo);
+    }
+
+    private async Task AgregarOActualizarArticulo()
+    {
+        if (string.IsNullOrWhiteSpace(articuloEnFormulario.Nombre) || articuloEnFormulario.Precio <= 0 || articuloEnFormulario.Cantidad <= 0)
+        {
+            mensajeError = "Nombre, Precio (>0) y Cantidad (>0) son obligatorios.";
+            return;
+        }
+        if (articuloSiendoEditado != null)
+        {
+            Controlador.actualizarArticulo(articuloSiendoEditado, articuloEnFormulario);
+            articuloSiendoEditado = null;
+        }
+        else
+        {
+            Controlador.agregarArticulo(articuloEnFormulario);
+        }
+        articulosEnMemoria = await Controlador.obtenerArticulos();
+        articuloEnFormulario = new Articulo();
+        mensajeError = "";
+    }
+
+
+    private async Task GuardarCambios()
+    {
+        mensajeError = "";
+        try
+        {
+            facturaAEditar.Fecha = fechaParaInput.ToString("yyyy-MM-dd");
+            facturaAEditar.Articulos = articulosEnMemoria;
+
+            await Controlador.ActualizarFactura(facturaAEditar);
+
+            NavigationManager.NavigateTo("/lista-facturas");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al guardar los cambios: {ex.Message}";
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        // Simplemente regresa a la lista
+        NavigationManager.NavigateTo("/lista-facturas");
+    }
+}

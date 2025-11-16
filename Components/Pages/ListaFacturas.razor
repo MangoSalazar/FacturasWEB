@@ -26,7 +26,7 @@ else
             {
                 <tr>
                     <td>@factura.Fecha</td>
-                    <td>@factura.Nombre</td>
+                    <td>@factura.Nombre    </td>
                     <td>@factura.Articulos.Count()</td>
                     <td>
                         <button @onclick="() => Editar(factura)">Editar</button>
@@ -42,7 +42,7 @@ else
 
     private List<Factura> facturasCargadas;
 
-    
+
     protected override async Task OnInitializedAsync()
     {
         facturasCargadas = await Controlador.obtenerFacturas();
@@ -50,9 +50,8 @@ else
 
     private void Editar(Factura factura)
     {
-        Console.WriteLine($"Editar factura ID: {factura}");
-        // Aquí podrías navegar a la otra página
-        // NavigationManager.NavigateTo($"/Facturitas/{idFactura}"); // (Si la modificas para editar)
+        Console.WriteLine($"Editar factura ID: {factura.Nombre + factura.ID_factura}");
+        NavigationManager.NavigateTo($"/EditarFactura/{factura.ID_factura}");
     }
 
     private async Task Eliminar(Factura factura)

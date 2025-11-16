@@ -32,13 +32,22 @@ namespace FacturasWEB.Components.Servicios
         {
             return await _servicioFacturas.obtenerFacturas();
         }
+        public async Task<Factura> obtenerFacturaPorId(int idFactura)
+        {
+            return await _servicioFacturas.obtenerFacturaPorId(idFactura);
+        }
         public async Task guardarFactura(Factura factura)
         {
             _servicioFacturas.guardarFactura(factura);
         }
+        public async Task ActualizarFactura(Factura factura)
+        {
+            await _servicioFacturas.ActualizarFactura(factura);
+        }
         public async Task eliminarFactura(Factura factura)
         {
             _servicioFacturas.eliminarFactura(factura);
-        }   
+        }
+
     }
 }

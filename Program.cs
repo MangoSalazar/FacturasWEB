@@ -49,27 +49,27 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE if not exists
 Articulos (
-    ID_articulos INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_articulo INTEGER PRIMARY KEY AUTOINCREMENT,
     Nombre TEXT NOT NULL,
-    Precio REAL NOT NULL -- 'REAL' es el tipo para números decimales en SQLite
+    Precio REAL NOT NULL
 );
 
 CREATE TABLE if not exists
 Facturas (
-    ID_facturas INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_factura INTEGER PRIMARY KEY AUTOINCREMENT,
     Fecha TEXT NOT NULL, 
     Nombre TEXT NOT NULL
 );
 
 CREATE TABLE if not exists
 Contiene (
-    ID_facturas INTEGER NOT NULL,
-    ID_articulos INTEGER NOT NULL,
+    ID_factura INTEGER NOT NULL,
+    ID_articulo INTEGER NOT NULL,
     Cantidad INTEGER NOT NULL,
-    PRIMARY KEY (ID_facturas, ID_articulos),
-    FOREIGN KEY (ID_facturas) REFERENCES Facturas(ID_facturas)
+    PRIMARY KEY (ID_factura, ID_articulo),
+    FOREIGN KEY (ID_factura) REFERENCES Facturas(ID_factura)
         ON DELETE CASCADE,
-    FOREIGN KEY (ID_articulos) REFERENCES Articulos(ID_articulos)
+    FOREIGN KEY (ID_articulo) REFERENCES Articulos(ID_articulo)
         ON DELETE RESTRICT
 );
 ";

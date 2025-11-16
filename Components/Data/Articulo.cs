@@ -8,6 +8,6 @@
 
         // Propiedades que se llenarán desde la tabla 'Contiene'
         public int Cantidad { get; set; }
-        public int ID_facturas { get; set; }
+        public int ID_factura { get; set; }
     }
 }
