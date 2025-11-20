@@ -297,5 +297,35 @@ namespace FacturasWEB.Components.Data
             }
             
         }
+        public async Task<DashboardDatos> ObtenerEstadisticas()
+        {
+            iniciarConexion();
+            var datos = new DashboardDatos();
+
+            var sql = @"
+            SELECT A.Nombre FROM Contiene C JOIN Articulos A ON C.ID_articulo = A.ID_articulo GROUP BY A.ID_articulo ORDER BY SUM(C.Cantidad) DESC LIMIT 1;
+        
+            SELECT strftime('%m', Fecha) FROM Facturas GROUP BY strftime('%m', Fecha) ORDER BY COUNT(*) DESC LIMIT 1;
+        
+            SELECT Nombre FROM Facturas GROUP BY Nombre ORDER BY COUNT(*) DESC LIMIT 1;
+
+            WITH TotalesPorFactura AS (
+                SELECT F.ID_factura, F.Fecha, SUM(A.Precio * C.Cantidad) as Total
+                FROM Facturas F
+                JOIN Contiene C ON F.ID_factura = C.ID_factura
+                JOIN Articulos A ON C.ID_articulo = A.ID_articulo
+                GROUP BY F.ID_factura
+            )
+            SELECT MAX(Total), MIN(Total) FROM TotalesPorFactura;
+        
+            SELECT strftime('%Y', F.Fecha) as Anio, SUM(A.Precio * C.Cantidad) as TotalAnual
+            FROM Facturas F
+            JOIN Contiene C ON F.ID_factura = C.ID_factura
+            JOIN Articulos A ON C.ID_articulo = A.ID_articulo
+            GROUP BY Anio ORDER BY TotalAnual DESC;
+            ";
+
+            return datos;
+        }
     }
 }
