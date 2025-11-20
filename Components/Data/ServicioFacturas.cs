@@ -324,7 +324,27 @@ namespace FacturasWEB.Components.Data
             JOIN Articulos A ON C.ID_articulo = A.ID_articulo
             GROUP BY Anio ORDER BY TotalAnual DESC;
             ";
+            using (var multi = await conexion.QueryMultipleAsync(sql))
+            {
+                datos.ArticuloMasVendido = await multi.ReadFirstOrDefaultAsync<string>() ?? "N/A";
 
+                var mesNumero = await multi.ReadFirstOrDefaultAsync<string>();
+                datos.MesConMasVentas = mesNumero != null ? System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(int.Parse(mesNumero)) : "N/A";
+
+                datos.ClienteMasRepetido = await multi.ReadFirstOrDefaultAsync<string>() ?? "N/A";
+
+                var extremos = await multi.ReadFirstOrDefaultAsync<(double Max, double Min)>();
+                datos.FacturaMasCara = extremos.Max;
+                datos.FacturaMasBarata = extremos.Min;
+
+                var ventasPorAno = (await multi.ReadAsync<(int Anio, double Total)>()).ToList();
+                if (ventasPorAno.Any())
+                {
+                    datos.AnioMasVentas = ventasPorAno.First().Anio;
+                    datos.AnioMenosVentas = ventasPorAno.Last().Anio;
+                    datos.PromedioComprasAnuales = ventasPorAno.Average(x => x.Total);
+                }
+            }
             return datos;
         }
     }
