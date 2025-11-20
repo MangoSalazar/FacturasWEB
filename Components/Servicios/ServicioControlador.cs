@@ -58,5 +58,9 @@ namespace FacturasWEB.Components.Servicios
             return await _servicioFacturas.ObtenerFacturasPorAno(ano);
         }
 
+        public async Task<DashboardDatos> ObtenerDashboardEstadisticas()
+        {
+            return await _servicioFacturas.ObtenerEstadisticas();
+        }
     }
 }
