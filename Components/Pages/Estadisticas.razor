@@ -1,0 +1,25 @@
+﻿@page "/estadisticas"
+@using FacturasWEB.Components.Servicios
+@using FacturasWEB.Components.Data
+@inject ServicioControlador Controlador
+@rendermode InteractiveServer
+
+<h3>Tablero de Estadísticas e Inteligencia</h3>
+
+@if (datos == null)
+{
+    <div class="alert alert-info">Calculando inteligencia de negocio...</div>
+}
+else
+{
+
+}
+
+@code {
+    private DashboardDatos datos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        datos = await Controlador.ObtenerDashboardEstadisticas();
+    }
+}
