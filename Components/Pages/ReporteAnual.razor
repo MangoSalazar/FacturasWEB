@@ -7,40 +7,57 @@
 
 <h3>Reporte Anual de Gastos</h3>
 
-<div>
-    <label>Año:</label>
-    <input type="number" @bind="anoParaBuscar" />
-    <button @onclick="GenerarReporte">Generar Reporte</button>
+<div class="mat-card">
+    <h5 class="mb-3">Configuración del Reporte</h5>
+    <div class="d-flex align-items-end gap-3">
+        <div class="flex-grow-1">
+            <label class="mat-label">Seleccione el Año</label>
+            <input type="number" class="mat-input" @bind="anoParaBuscar" placeholder="Ej. 2024" />
+        </div>
+        <div>
+            <button class="mat-btn mat-btn-primary" @onclick="GenerarReporte">
+                <i class="bi bi-search"></i> Generar Reporte
+            </button>
+        </div>
+    </div>
 </div>
-
-<hr />
 
 @if (reporteGenerado)
 {
-    <h4>Resultados para el año @anoParaBuscar</h4>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Mes</th>
-                <th>Total Gastado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < 12; i++)
-            {
-                <tr>
-                    <td>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1)</td>
-                    <td>@totalesMensuales[i].ToString("C")</td>
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td style="font-weight: bold;">TOTAL ANUAL:</td>
-                <td style="font-weight: bold;">@granTotal.ToString("C")</td>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="mat-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="m-0">Resultados del año <span style="color: var(--accent);">@anoParaBuscar</span></h4>
+            <span class="badge bg-secondary p-2">12 Meses</span>
+        </div>
+
+        <div class="mat-table-container">
+            <table class="mat-table">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th style="text-align: right;">Total Gastado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < 12; i++)
+                    {
+                        <tr style="@(totalesMensuales[i] > 0 ? "font-weight: 500;" : "color: #999;")">
+                            <td>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1)</td>
+                            <td style="text-align: right;">@totalesMensuales[i].ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: var(--primary-dark); color: white;">
+                        <td style="font-weight: bold; padding: 15px;">TOTAL ANUAL:</td>
+                        <td style="font-weight: bold; text-align: right; font-size: 1.2rem; padding: 15px;">
+                            @granTotal.ToString("C")
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 }
 
 @code {
