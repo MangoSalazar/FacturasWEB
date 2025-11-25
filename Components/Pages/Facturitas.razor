@@ -7,69 +7,103 @@
 
 <h3>Nueva Factura</h3>
 
-<div>
-    <label>Nombre del Cliente:</label>
-    <input type="text" @bind="nuevaFactura.Nombre"/>
-</div>
-<div>
-    <label>Fecha:</label>
-    <input type="date" @bind="fechaParaInput"  />
-</div>
-
-<hr />
-
-<div>
-    <h4>Añadir Artículo</h4>
-    <div>
-        <label>Artículo:</label>
-        <input @bind="nuevoArticulo.Nombre" placeholder="Nombre del articulo" />
+<div class="mat-card">
+    <div class="row">
+        <div class="col-md-8 mat-form-group">
+            <label class="mat-label">Nombre del Cliente</label>
+            <input type="text" class="mat-input" @bind="nuevaFactura.Nombre" placeholder="Ej. Empresa S.A." />
+        </div>
+        <div class="col-md-4 mat-form-group">
+            <label class="mat-label">Fecha de Emisión</label>
+            <input type="date" class="mat-input" @bind="fechaParaInput" />
+        </div>
     </div>
-    <div>
-        <label>Precio:</label>
-        <input @bind="nuevoArticulo.Precio" type="number" step="1" min="0.1" />
-    </div>
-    <div>
-        <label>Cantidad:</label>
-        <input @bind="nuevoArticulo.Cantidad" type="number" min="1" placeholder="1" />
-    </div>
-    <button @onclick="agregarArticulo">Añadir ese articulo</button>
 </div>
 
-<hr />
+<div class="mat-card" style="border-left: 5px solid var(--accent);">
+    <h4><span class="bi bi-cart-plus"></span> Añadir Artículos</h4>
 
-<h4>Artículos de la Factura</h4>
+    <div class="row align-items-end">
+        <div class="col-md-5 mat-form-group">
+            <label class="mat-label">Descripción del Artículo</label>
+            <input class="mat-input" @bind="nuevoArticulo.Nombre" placeholder="Ej. Monitor 24 pulgadas" />
+        </div>
+        <div class="col-md-3 mat-form-group">
+            <label class="mat-label">Precio Unitario</label>
+            <input class="mat-input" @bind="nuevoArticulo.Precio" type="number" step="1" min="0.1" />
+        </div>
+        <div class="col-md-2 mat-form-group">
+            <label class="mat-label">Cantidad</label>
+            <input class="mat-input" @bind="nuevoArticulo.Cantidad" type="number" min="1" placeholder="1" />
+        </div>
+        <div class="col-md-2 mat-form-group">
+            <button class="mat-btn mat-btn-accent w-100" @onclick="agregarArticulo">
+                Añadir
+            </button>
+        </div>
+    </div>
+</div>
 
-<ol>
-    @foreach (var art in articulos)
+<div class="mat-card">
+    <h4>Resumen de Artículos</h4>
+
+    @if (!articulos.Any())
     {
-        <li>
-            <span>@art.Nombre</span> |
-            <span>Precio: @art.Precio</span> |
-            <span>Cantidad: @art.Cantidad</span> |
-            <span>Subtotal: @(art.Precio * art.Cantidad)</span>
-            <button @onclick="() => actualizarArticulo(art)">Editar</button>
-            <button @onclick="() => eliminarArticulo(art)">Eliminar</button>
-        </li>
+        <div class="alert alert-secondary">No hay artículos en la lista aún.</div>
     }
-</ol>
+    else
+    {
+        <div class="mat-table-container">
+            <table class="mat-table">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cant.</th>
+                        <th>Subtotal</th>
+                        <th style="text-align: right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var art in articulos)
+                    {
+                        <tr>
+                            <td>@art.Nombre</td>
+                            <td>$@art.Precio</td>
+                            <td>@art.Cantidad</td>
+                            <td style="font-weight: bold; color: var(--primary-light)">
+                                $@(art.Precio* art.Cantidad)
+                            </td>
+                            <td style="text-align: right">
+                                <button class="mat-btn mat-btn-accent" style="padding: 5px 10px; font-size: 0.8rem;" @onclick="() => actualizarArticulo(art)">Editar</button>
+                                <button class="mat-btn mat-btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" @onclick="() => eliminarArticulo(art)">Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-<div>
-    <h4>Total: @total </h4>
-    
+        <div class="d-flex justify-content-end mt-4">
+            <h3 style="color: var(--primary-dark)">Total: $@total</h3>
+        </div>
+    }
 </div>
 
-<hr />
+<div class="d-flex justify-content-between mb-5">
+    <a href="lista-facturas">
+        <button class="mat-btn" style="background: white; border: 1px solid #ccc;">Ver Facturas</button>
+    </a>
 
-<div>
-    <button @onclick="guardarFactura">Guardar la factura</button>
+    <button class="mat-btn mat-btn-primary" @onclick="guardarFactura">
+        Guardar Factura Completa
+    </button>
 </div>
-@mensajeError
-<hr/>
 
-<a href="lista-facturas">
-    <button>Ver facturas</button>
-</a>
-
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">@mensajeError</div>
+}
 @code {
     private Factura nuevaFactura = new Factura();
     private Articulo nuevoArticulo = new Articulo();
