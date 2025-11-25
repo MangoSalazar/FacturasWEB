@@ -8,75 +8,133 @@
 
 @if (facturaAEditar == null)
 {
-    <p>Cargando datos de la factura...</p>
+    <div class="alert alert-info mat-card">
+        <div class="d-flex align-items-center">
+            <div class="spinner-border text-primary me-3" role="status"></div>
+            <span>Cargando datos de la factura...</span>
+        </div>
+    </div>
 }
 else
 {
-    <h3>Editando Factura (@facturaAEditar.Nombre)</h3>
-
-    <div>
-        <label>Nombre del Cliente:</label>
-        <span>(@facturaAEditar.Nombre)</span>
-        <input @bind="facturaAEditar.Nombre" />
-    </div>
-    <div>
-        <label>Fecha:</label>
-        <span>(@facturaAEditar.Fecha)</span>
-        <input type="date" @bind="fechaParaInput" />
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Editando Factura <small class="text-muted" style="font-size: 0.6em;">#@IdFactura</small></h3>
     </div>
 
-    <hr />
+    <div class="mat-card">
+        <h5 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Datos Generales</h5>
+        <div class="row">
+            <div class="col-md-8 mat-form-group">
+                <label class="mat-label">Nombre del Cliente</label>
+                <small class="text-muted d-block mb-1">Actual: @facturaAEditar.Nombre</small>
+                <input type="text" class="mat-input" @bind="facturaAEditar.Nombre" />
+            </div>
+            <div class="col-md-4 mat-form-group">
+                <label class="mat-label">Fecha de Emisión</label>
+                <small class="text-muted d-block mb-1">Actual: @facturaAEditar.Fecha</small>
+                <input type="date" class="mat-input" @bind="fechaParaInput" />
+            </div>
+        </div>
+    </div>
 
-    <div>
-        <h4>Añadir/Editar Artículo</h4>
-        <div>
-            <label>Artículo:</label>
-            <input @bind="articuloEnFormulario.Nombre" />
+    <div class="mat-card" style="border-left: 5px solid var(--accent);">
+        <h4>
+            <span class="bi bi-pencil-square"></span>
+            @(articuloSiendoEditado == null ? "Añadir Artículo" : "Editando Artículo Seleccionado")
+        </h4>
+
+        <div class="row align-items-end">
+            <div class="col-md-5 mat-form-group">
+                <label class="mat-label">Descripción</label>
+                <input class="mat-input" @bind="articuloEnFormulario.Nombre" placeholder="Nombre del artículo" />
+            </div>
+            <div class="col-md-3 mat-form-group">
+                <label class="mat-label">Precio</label>
+                <input type="number" step="0.1" class="mat-input" @bind="articuloEnFormulario.Precio" />
+            </div>
+            <div class="col-md-2 mat-form-group">
+                <label class="mat-label">Cantidad</label>
+                <input type="number" class="mat-input" @bind="articuloEnFormulario.Cantidad" />
+            </div>
+            <div class="col-md-2 mat-form-group d-flex gap-2">
+                <button class="mat-btn mat-btn-accent w-100" @onclick="AgregarOActualizarArticulo">
+                    @(articuloSiendoEditado == null ? "Añadir" : "Actualizar")
+                </button>
+
+                @if (articuloSiendoEditado != null)
+                {
+                    <button class="mat-btn mat-btn-danger" title="Cancelar edición" @onclick="CancelarEdicion">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                }
+            </div>
         </div>
-        <div>
-            <label>Precio:</label>
-            <input type="number" step="0.1" @bind="articuloEnFormulario.Precio" />
+    </div>
+
+    <div class="mat-card p-0">
+        <div class="p-3 border-bottom">
+            <h4 class="m-0">Contenido de la Factura</h4>
         </div>
-        <div>
-            <label>Cantidad:</label>
-            <input type="number" @bind="articuloEnFormulario.Cantidad" />
-        </div>
-        <button @onclick="AgregarOActualizarArticulo">
-            @(articuloSiendoEditado == null ? "Añadir Artículo" : "Actualizar Artículo")
+
+        @if (articulosEnMemoria.Count == 0)
+        {
+            <div class="p-4 text-center text-muted">Esta factura no tiene artículos.</div>
+        }
+        else
+        {
+            <div class="mat-table-container" style="box-shadow: none; border-radius: 0;">
+                <table class="mat-table">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Cant.</th>
+                            <th>Subtotal</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var art in articulosEnMemoria)
+                        {
+                            <tr style="@(articuloSiendoEditado == art ? "background-color: #e3f2fd;" : "")">
+                                <td>@art.Nombre</td>
+                                <td>$@art.Precio</td>
+                                <td>@art.Cantidad</td>
+                                <td style="font-weight: bold; color: var(--primary-light);">
+                                    $@(art.Precio* art.Cantidad)
+                                </td>
+                                <td style="text-align: right;">
+                                    <button class="mat-btn mat-btn-accent" style="padding: 5px 10px; font-size: 0.8rem;" @onclick="() => CargarArticuloParaEdicion(art)">
+                                        Editar
+                                    </button>
+                                    <button class="mat-btn mat-btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" @onclick="() => EliminarArticulo(art)">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background-color: var(--primary-dark); color: white; padding: 15px; border-radius: 0 0 8px 8px; text-align: right;">
+                <h3 class="m-0" style="color: white;">Total: $@TotalCalculado</h3>
+            </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger mt-3">@mensajeError</div>
+    }
+
+    <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+        <button class="mat-btn" style="background: white; border: 1px solid #ccc;" @onclick="Cancelar">
+            Cancelar y Volver
         </button>
-        @if (articuloSiendoEditado != null)
-        {
-            <button @onclick="CancelarEdicion">Cancelar Edición</button>
-        }
-    </div>
-
-    <hr />
-
-    <h4>Artículos de la Factura</h4>
-    <ol>
-        @foreach (var art in articulosEnMemoria)
-        {
-            <li>
-                <span>@art.Nombre</span> |
-                <span>Precio: @art.Precio</span> |
-                <span>Cantidad: @art.Cantidad</span> |
-                <span>Subtotal: @(art.Precio* art.Cantidad)</span>
-                <button @onclick="() => CargarArticuloParaEdicion(art)">Editar</button>
-                <button @onclick="() => EliminarArticulo(art)">Eliminar</button>
-            </li>
-        }
-    </ol>
-
-    <div>
-        <h4>Total: @TotalCalculado </h4>
-    </div>
-    <div style="color: red;">@mensajeError</div>
-
-    <hr />
-
-    <div>
-        <button @onclick="GuardarCambios">Guardar Cambios</button>
-        <button @onclick="Cancelar">Cancelar</button>
+        <button class="mat-btn mat-btn-primary" @onclick="GuardarCambios">
+            <i class="bi bi-save"></i> Guardar Cambios
+        </button>
     </div>
 }
 
