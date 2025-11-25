@@ -5,41 +5,48 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<h3>Lista de Facturas</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Historial de Facturas</h3>
+    <a href="estadisticas">
+        <button class="mat-btn mat-btn-accent">Ver Estadísticas</button>
+    </a>
+</div>
 
 @if (!facturasCargadas.Any())
 {
-    <p>No hay facturas guardadas en la base de datos.</p>
+    <div class="mat-card">
+        <p class="text-muted text-center m-0">No hay facturas guardadas en la base de datos.</p>
+    </div>
 }
 else
 {
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Nombre  </th>
-                <th>Cantidad de Artículos</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var factura in facturasCargadas)
-            {
+    <div class="mat-table-container">
+        <table class="mat-table">
+            <thead>
                 <tr>
-                    <td>@factura.Fecha</td>
-                    <td>@factura.Nombre    </td>
-                    <td>@factura.Articulos.Count()</td>
-                    <td>
-                        <button @onclick="() => Editar(factura)">Editar</button>
-                        <button @onclick="() => Eliminar(factura)">Eliminar</button>
-                    </td>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th class="text-center">Artículos</th>
+                    <th style="text-align: right;">Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var factura in facturasCargadas)
+                {
+                    <tr>
+                        <td>@factura.Fecha</td>
+                        <td style="font-weight: 500; color: var(--primary-dark);">@factura.Nombre</td>
+                        <td class="text-center"><span class="badge bg-secondary">@factura.Articulos.Count()</span></td>
+                        <td style="text-align: right;">
+                            <button class="mat-btn mat-btn-accent" style="padding: 6px 12px;" @onclick="() => Editar(factura)">Editar</button>
+                            <button class="mat-btn mat-btn-danger" style="padding: 6px 12px;" @onclick="() => Eliminar(factura)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
-<a href="estadisticas">
-    <button>Ver estadisticas</button>
-</a>
 @code {
 
     private List<Factura> facturasCargadas;
