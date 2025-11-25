@@ -1,2 +1,183 @@
-﻿body {
+﻿:root {
+    /* --- TU PALETA DE COLORES --- */
+    --primary-dark: #393D7E; /* Azul Oscuro: Encabezados, Botones Principales */
+    --primary-light: #5459AC; /* Azul Medio: Hover, Bordes activos */
+    --accent: #6DC3BB; /* Turquesa: Botones de Acción (Agregar, Editar) */
+    --highlight: #F2AEBB; /* Rosa: Alertas, Botones de Cancelar/Eliminar */
+    /* --- MATERIAL DESIGN NEUTROS --- */
+    --bg-app: #F5F7FA; /* Fondo gris muy suave */
+    --surface: #FFFFFF; /* Blanco puro para tarjetas */
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #E0E0E0;
+    /* --- SOMBRAS Y BORDES --- */
+    --radius: 8px;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+h3, h4, h5 {
+    color: var(--primary-dark);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+/* --- TARJETAS (MATERIAL CARDS) --- */
+.mat-card {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .mat-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+/* --- INPUTS --- */
+.mat-form-group {
+    margin-bottom: 1.2rem;
+}
+
+.mat-label {
+    display: block;
+    color: var(--primary-dark);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.mat-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px; /* Bordes ligeramente redondeados */
+    background-color: #FAFAFA;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+    .mat-input:focus {
+        outline: none;
+        border-color: var(--primary-light);
+        background-color: var(--surface);
+        box-shadow: 0 0 0 3px rgba(84, 89, 172, 0.15); /* Sombra suave azul */
+    }
+
+/* --- BOTONES --- */
+.mat-btn {
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .mat-btn:active {
+        transform: translateY(1px);
+        box-shadow: none;
+    }
+
+/* Botón Primario (Guardar) - Azul Oscuro */
+.mat-btn-primary {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+    .mat-btn-primary:hover {
+        background-color: #2c2f63;
+        box-shadow: var(--shadow-md);
+    }
+
+/* Botón Acento (Agregar/Editar) - Turquesa */
+.mat-btn-accent {
+    background-color: var(--accent);
+    color: white;
+}
+
+    .mat-btn-accent:hover {
+        background-color: #5bb0a8;
+        box-shadow: var(--shadow-md);
+    }
+
+/* Botón Peligro (Eliminar) - Rosa */
+.mat-btn-danger {
+    background-color: var(--highlight);
+    color: #8a3c4c; /* Texto oscuro para contraste */
+}
+
+    .mat-btn-danger:hover {
+        background-color: #e69aa9;
+    }
+
+/* --- TABLAS --- */
+.mat-table-container {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.mat-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--surface);
+}
+
+    .mat-table thead {
+        background-color: var(--primary-dark);
+        color: white;
+    }
+
+    .mat-table th, .mat-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .mat-table tr:hover {
+        background-color: #f0f2f5;
+    }
+
+/* --- ESTADISTICAS --- */
+.stat-card {
+    border-radius: var(--radius);
+    padding: 20px;
+    color: white;
+    height: 100%;
+    box-shadow: var(--shadow-sm);
+}
+
+.bg-turquesa {
+    background-color: var(--accent);
+}
+
+.bg-azul-oscuro {
+    background-color: var(--primary-dark);
+}
+
+.bg-azul-medio {
+    background-color: var(--primary-light);
+}
+
+.bg-rosa {
+    background-color: var(--highlight);
+    color: var(--primary-dark);
 }
