@@ -6,5 +6,6 @@
         public string Nombre { set; get; }
         public string Fecha { get; set; }
         public List<Articulo> Articulos { get; set; } = new List<Articulo>();
+        public int EsArchivada { get; set; }
     }
 }
