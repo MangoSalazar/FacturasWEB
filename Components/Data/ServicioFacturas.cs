@@ -56,10 +56,12 @@ namespace FacturasWEB.Components.Data
         {
             iniciarConexion();
             var sql = @"
-            SELECT * FROM Facturas;
+            SELECT ID_factura AS ID_factura, Nombre, Fecha, EsArchivada 
+            FROM Facturas 
+            WHERE EsArchivada = 0;
         
             SELECT 
-                c.ID_factura,  -- ID de la factura a la que pertenece
+                c.ID_factura,
                 c.Cantidad,
                 a.ID_articulo,
                 a.Nombre,
@@ -266,10 +268,10 @@ namespace FacturasWEB.Components.Data
             var anoString = ano.ToString();
 
             var sql = @"
-                SELECT 
-                    ID_factura, Nombre, Fecha 
+                SELECT ID_factura AS ID_factura, Nombre, Fecha 
                 FROM Facturas 
-                WHERE strftime('%Y', Fecha) = @Ano;
+                WHERE strftime('%Y', Fecha) = @Ano 
+                AND EsArchivada = 0; -- ¡IMPORTANTE! QUE NO SALGAN EN EL REPORTE
         
                 SELECT 
                     c.ID_factura AS ID_factura,
@@ -346,6 +348,21 @@ namespace FacturasWEB.Components.Data
                 }
             }
             return datos;
+        }
+
+        public async Task ArchivarFacturaAsync(int idFactura)
+        {
+            iniciarConexion();
+            // Simplemente cambiamos el 0 por un 1
+            var sql = "UPDATE Facturas SET EsArchivada = 1 WHERE ID_factura = @Id";
+            await conexion.ExecuteAsync(sql, new { Id = idFactura });
+        }
+        public async Task DesarchivarFacturaAsync(int idFactura)
+        {
+            iniciarConexion();
+            var sql = "UPDATE Facturas SET EsArchivada = 0 WHERE ID_facturas = @Id";
+            await conexion.ExecuteAsync(sql, new { Id = idFactura });
+
         }
     }
 }
