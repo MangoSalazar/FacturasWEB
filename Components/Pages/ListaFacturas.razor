@@ -40,6 +40,9 @@ else
                         <td style="text-align: right;">
                             <button class="mat-btn mat-btn-accent" style="padding: 6px 12px;" @onclick="() => Editar(factura)">Editar</button>
                             <button class="mat-btn mat-btn-danger" style="padding: 6px 12px;" @onclick="() => Eliminar(factura)">Eliminar</button>
+                            <button class="mat-btn" style="background-color: #FFB74D; color: white; padding: 6px 12px; margin: 0 5px;" @onclick="() => Archivar(factura)">
+                                <i class="bi bi-archive"></i> Archivar
+                            </button>
                         </td>
                     </tr>
                 }
@@ -69,5 +72,10 @@ else
         Controlador.eliminarFactura(factura);
         facturasCargadas = await Controlador.obtenerFacturas(); 
         Console.WriteLine("Factura eliminada y lista recargada.");
+    }
+    private async Task Archivar(Factura factura)
+    {
+        await Controlador.ArchivarFactura(factura.ID_factura);
+        facturasCargadas = await Controlador.obtenerFacturas();
     }
 }
