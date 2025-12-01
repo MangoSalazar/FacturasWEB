@@ -62,5 +62,19 @@ namespace FacturasWEB.Components.Servicios
         {
             return await _servicioFacturas.ObtenerEstadisticas();
         }
+        public async Task ArchivarFactura(int id)
+        {
+            await _servicioFacturas.ArchivarFacturaAsync(id);
+        }
+
+        public async Task<List<Factura>> ObtenerArchivadas()
+        {
+            return await _servicioFacturas.ObtenerFacturasArchivadas();
+        }
+
+        public async Task DesarchivarFactura(int id)
+        {
+            await _servicioFacturas.DesarchivarFacturaAsync(id);
+        }
     }
 }
