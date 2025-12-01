@@ -349,6 +349,33 @@ namespace FacturasWEB.Components.Data
             }
             return datos;
         }
+        public async Task<List<Factura>> ObtenerFacturasArchivadas()
+        {
+            iniciarConexion();
+            var sql = @"
+                SELECT ID_factura AS ID_factura, Nombre, Fecha, EsArchivada 
+                FROM Facturas 
+                WHERE EsArchivada = 1; -- AQUÍ BUSCAMOS LAS QUE SÍ ESTÁN ARCHIVADAS
+        
+                SELECT 
+                    c.ID_factura AS ID_factura, c.Cantidad, a.ID_articulo, a.Nombre, a.Precio
+                FROM Articulos a
+                JOIN Contiene c ON a.ID_articulo = c.ID_articulo
+                WHERE c.ID_factura IN (SELECT ID_factura FROM Facturas WHERE EsArchivada = 1);
+            ";
+            using (var multi = await conexion.QueryMultipleAsync(sql))
+            {
+                var facturas = (await multi.ReadAsync<Factura>()).ToList();
+                Console.WriteLine($"Facturas obtenidas: {facturas.Count}");
+                var articulos = (await multi.ReadAsync<Articulo>()).ToList();
+                foreach (var factura in facturas)
+                {
+                    factura.Articulos.AddRange(articulos.Where(a => a.ID_factura == factura.ID_factura));
+                    Console.WriteLine($"Factura ID {factura.ID_factura} tiene {factura.Articulos.Count} artículos.");
+                }
+                return facturas;
+            }
+        }
 
         public async Task ArchivarFacturaAsync(int idFactura)
         {
@@ -360,7 +387,7 @@ namespace FacturasWEB.Components.Data
         public async Task DesarchivarFacturaAsync(int idFactura)
         {
             iniciarConexion();
-            var sql = "UPDATE Facturas SET EsArchivada = 0 WHERE ID_facturas = @Id";
+            var sql = "UPDATE Facturas SET EsArchivada = 0 WHERE ID_factura = @Id";
             await conexion.ExecuteAsync(sql, new { Id = idFactura });
 
         }

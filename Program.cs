@@ -59,7 +59,7 @@ Facturas (
     ID_factura INTEGER PRIMARY KEY AUTOINCREMENT,
     Fecha TEXT NOT NULL, 
     Nombre TEXT NOT NULL,
-    EsArchivada INTEGER DEFAULT 0;
+    EsArchivada INTEGER DEFAULT 0
 );
 
 CREATE TABLE if not exists
